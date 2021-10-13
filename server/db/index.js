@@ -9,8 +9,18 @@ var mysql = require('mysql2');
 // OR
 // user: 'root', password: 'some_password_you_created_at_install'
 
-console.log('we got here!');
-mysql.connection = function() {
-  username:'root',
+console.log('What is this object:', mysql);
+var connection = mysql.createConnection({
+  user: 'root',
   password: ''
-};
+});
+
+connection.connect(function(err) {
+  if (err) {
+    console.log('error connecting: ' + err.stack);
+    return;
+  }
+
+  console.log('connected as id ' + connection.threadId);
+});
+
