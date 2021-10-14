@@ -9,10 +9,11 @@ var mysql = require('mysql2');
 // OR
 // user: 'root', password: 'some_password_you_created_at_install'
 
-console.log('What is this object:', mysql);
+
 var connection = mysql.createConnection({
   user: 'root',
-  password: ''
+  password: '',
+  database: 'chat'
 });
 
 connection.connect(function(err) {
@@ -24,3 +25,4 @@ connection.connect(function(err) {
   console.log('connected as id ' + connection.threadId);
 });
 
+module.exports = connection;

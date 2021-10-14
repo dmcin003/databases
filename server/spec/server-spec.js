@@ -29,14 +29,14 @@ describe('Persistent Node Chat Server', () => {
   });
 
   it('Should insert posted messages to the DB', (done) => {
-    const username = 'Valjean';
-    const message = 'In mercy\'s name, three days is all I need.';
-    const roomname = 'Hello';
+    const username = 'FakeName1';
+    const text = 'Will there ?';
+    const room = 'Hello';
     // Create a user on the chat server database.
     axios.post(`${API_URL}/users`, { username })
       .then(() => {
         // Post a message to the node chat server:
-        return axios.post(`${API_URL}/messages`, { username, message, roomname });
+        return axios.post(`${API_URL}/messages`, { username, text, room });
       })
       .then(() => {
         // Now if we look in the database, we should find the posted message there.
@@ -46,15 +46,16 @@ describe('Persistent Node Chat Server', () => {
         const queryString = 'SELECT * FROM messages';
         const queryArgs = [];
 
-        dbConnection.query(queryString, queryArgs, (err, results) => {
+        dbConnection.query(queryString, (err, results) => {
           if (err) {
             throw err;
           }
           // Should have one result:
+
           expect(results.length).toEqual(1);
 
           // TODO: If you don't have a column named text, change this test.
-          expect(results[0].text).toEqual(message);
+          expect(results[0].text).toEqual(text);
           done();
         });
       })
@@ -64,13 +65,17 @@ describe('Persistent Node Chat Server', () => {
   });
 
   it('Should output all messages from the DB', (done) => {
+    const text = 'Will there ?';
+    const room = 'Hello';
+
     // Let's insert a message into the db
-    const queryString = '';
+    const queryString = `INSERT INTO messages (text, roomname) VALUE ('${text}', '${room}')`;
     const queryArgs = [];
     /* TODO: The exact query string and query args to use here
      * depend on the schema you design, so I'll leave them up to you. */
     dbConnection.query(queryString, queryArgs, (err) => {
       if (err) {
+        console.log('we got here 75');
         throw err;
       }
 
@@ -78,8 +83,11 @@ describe('Persistent Node Chat Server', () => {
       axios.get(`${API_URL}/messages`)
         .then((response) => {
           const messageLog = response.data;
-          expect(messageLog[0].text).toEqual(message);
-          expect(messageLog[0].roomname).toEqual(roomname);
+          console.log('response stuff: ', messageLog);
+          console.log('this is our text: ', messageLog[0].text);
+          console.log('this is our room: ', messageLog[0].room);
+          expect(messageLog[0].text).toEqual(text);
+          expect(messageLog[0].roomname).toEqual(room);
           done();
         })
         .catch((err) => {
